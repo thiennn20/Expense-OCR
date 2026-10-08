@@ -59,28 +59,28 @@ class Expense {
   }
 
   Map<String, Object?> toMap() => {
-        if (id != null) 'id': id,
-        'merchant': merchant,
-        'amount': amount,
-        'category': category.name,
-        'date': date.millisecondsSinceEpoch,
-        'note': note,
-        'image_file': imageFile,
-        'thumb_file': thumbFile,
-        'raw_text': rawText,
-        'created_at': createdAt.millisecondsSinceEpoch,
-      };
+    if (id != null) 'id': id,
+    'merchant': merchant,
+    'amount': amount,
+    'category': category.name,
+    'date': date.millisecondsSinceEpoch,
+    'note': note,
+    'image_file': imageFile,
+    'thumb_file': thumbFile,
+    'raw_text': rawText,
+    'created_at': createdAt.millisecondsSinceEpoch,
+  };
 
   factory Expense.fromMap(Map<String, Object?> map) => Expense(
-        id: map['id'] as int?,
-        merchant: map['merchant'] as String? ?? '',
-        amount: (map['amount'] as num?)?.toDouble() ?? 0,
-        category: ExpenseCategory.fromName(map['category'] as String?),
-        date: DateTime.fromMillisecondsSinceEpoch(map['date'] as int),
-        note: map['note'] as String? ?? '',
-        imageFile: map['image_file'] as String?,
-        thumbFile: map['thumb_file'] as String?,
-        rawText: map['raw_text'] as String? ?? '',
-        createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
-      );
+    id: map['id'] as int?,
+    merchant: map['merchant'] as String? ?? '',
+    amount: (map['amount'] as num?)?.toDouble() ?? 0,
+    category: ExpenseCategory.fromName(map['category'] as String?),
+    date: DateTime.fromMillisecondsSinceEpoch(map['date'] as int),
+    note: map['note'] as String? ?? '',
+    imageFile: map['image_file'] as String?,
+    thumbFile: map['thumb_file'] as String?,
+    rawText: map['raw_text'] as String? ?? '',
+    createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
+  );
 }

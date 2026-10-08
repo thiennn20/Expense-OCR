@@ -53,5 +53,4 @@ double digitRatio(String s) {
 }
 
 /// Number of letters (including Vietnamese letters) in [s].
-int letterCount(String s) =>
-    RegExp(r'[A-Za-zÀ-ỹĐđ]').allMatches(s).length;
+int letterCount(String s) => RegExp(r'[A-Za-zÀ-ỹĐđ]').allMatches(s).length;

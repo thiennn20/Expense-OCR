@@ -1,0 +1,164 @@
+name: Android APK and release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'APK version (vMAJOR.MINOR.PATCH); manual runs only upload artifacts'
+        required: true
+        default: v1.0.0
+        type: string
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Resolve APK version
+        id: version
+        env:
+          MANUAL_VERSION: ${{ inputs.version }}
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" == "push" && "$GITHUB_REF" == refs/tags/v* ]]; then
+            version="$GITHUB_REF_NAME"
+          elif [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            version="$MANUAL_VERSION"
+          else
+            version="v$(sed -nE 's/^version: ([0-9]+\.[0-9]+\.[0-9]+).*/\1/p' pubspec.yaml)"
+          fi
+          if [[ ! "$version" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo 'Version must have the form vMAJOR.MINOR.PATCH (for example v1.0.0).' >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "APK_BUILD_NAME=${version#v}" >> "$GITHUB_ENV"
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.47.6'
+          cache: true
+
+      - name: Cache Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
+
+      - name: Flutter doctor
+        run: flutter doctor -v
+
+      - name: Resolve dependencies
+        run: |
+          flutter pub get
+          git diff --exit-code -- pubspec.lock
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Build universal APK
+        run: |
+          flutter build apk --release --build-name="$APK_BUILD_NAME"
+          mkdir -p release-apks
+          cp build/app/outputs/flutter-apk/app-release.apk "release-apks/Expense-OCR-${{ steps.version.outputs.version }}.apk"
+
+      - name: Build APKs per ABI
+        run: |
+          flutter build apk --release --split-per-abi --build-name="$APK_BUILD_NAME"
+          for abi in arm64-v8a armeabi-v7a x86_64; do
+            cp "build/app/outputs/flutter-apk/app-$abi-release.apk" release-apks/
+          done
+          test "$(find release-apks -maxdepth 1 -name '*.apk' | wc -l)" -eq 4
+
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Expense-OCR-${{ steps.version.outputs.version }}-${{ github.run_id }}
+          path: release-apks/*.apk
+          if-no-files-found: error
+          retention-days: 14
+
+  release:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Download verified APKs
+        uses: actions/download-artifact@v4
+        with:
+          name: Expense-OCR-${{ needs.build.outputs.version }}-${{ github.run_id }}
+          path: release-apks
+
+      - name: Write release notes
+        run: |
+          cat > release-notes.md <<'NOTES'
+          ## Features
+          - Camera receipt capture, cropping, gallery import and manual entry.
+          - Google ML Kit OCR on the device with the bundled Latin model.
+          - Regex/heuristic ReceiptParser for total, merchant, date and category.
+          - Review & Verification before saving expenses.
+          - SQLite expense history with editing, search and delete/undo.
+          - Donut chart and weekly bar chart drawn with CustomPainter.
+          - Light/Dark Mode.
+
+          ## Installation and current limitations
+          Download the universal Expense-OCR APK, or choose an APK for your device's ABI.
+          On Android, allow installation from the browser/file manager when prompted.
+          Camera permission is required for scanning; OCR accuracy depends on photo quality
+          and receipt layout. The parser is heuristic: review every result before saving.
+          Only the Latin OCR model is bundled. Desktop/web OCR is not supported.
+          These APKs use debug signing for coursework sideloading, not Google Play.
+          Each clean runner can generate a different debug key: an update may require
+          uninstalling the old APK, which deletes local expenses and receipt images.
+          Configure a persistent release keystore through GitHub Secrets before production.
+          NOTES
+
+      - name: Publish official GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ needs.build.outputs.version }}
+        run: |
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" release-apks/*.apk --clobber
+            gh release edit "$RELEASE_TAG" --title "Expense-OCR $RELEASE_TAG" \
+              --notes-file release-notes.md --draft=false --prerelease=false --latest
+          else
+            gh release create "$RELEASE_TAG" release-apks/*.apk --verify-tag \
+              --title "Expense-OCR $RELEASE_TAG" --notes-file release-notes.md \
+              --draft=false --prerelease=false --latest
+          fi

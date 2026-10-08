@@ -26,11 +26,15 @@ Future<ScanOutcome> scanReceipt({
   Rect? crop,
   double? previewAspect,
 }) async {
-  final stored = await images.saveReceipt(sourcePath,
-      crop: crop, previewAspect: previewAspect);
+  final stored = await images.saveReceipt(
+    sourcePath,
+    crop: crop,
+    previewAspect: previewAspect,
+  );
   try {
-    final result =
-        await ocr.recognizeFile(images.resolve(stored.imageFile).path);
+    final result = await ocr.recognizeFile(
+      images.resolve(stored.imageFile).path,
+    );
     final parsed = parser.parse(result.rows);
     final now = DateTime.now();
     return ScanOutcome(

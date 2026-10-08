@@ -37,7 +37,9 @@ double? parseTypedAmount(String text) {
 class ThousandsInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     final digits = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
     if (digits.isEmpty) return const TextEditingValue();
     final trimmed = digits.length > 12 ? digits.substring(0, 12) : digits;

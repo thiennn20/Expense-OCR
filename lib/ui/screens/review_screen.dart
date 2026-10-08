@@ -20,15 +20,15 @@ class ReviewScreen extends StatefulWidget {
   });
 
   ReviewScreen.manual({super.key})
-      : initial = Expense(
-          merchant: '',
-          amount: 0,
-          category: ExpenseCategory.food,
-          date: DateTime.now(),
-          createdAt: DateTime.now(),
-        ),
-        parsed = null,
-        ocrTime = null;
+    : initial = Expense(
+        merchant: '',
+        amount: 0,
+        category: ExpenseCategory.food,
+        date: DateTime.now(),
+        createdAt: DateTime.now(),
+      ),
+      parsed = null,
+      ocrTime = null;
 
   final Expense initial;
   final ParsedReceipt? parsed;
@@ -44,7 +44,10 @@ class _ReviewScreenState extends State<ReviewScreen> {
   final _formKey = GlobalKey<FormState>();
   late final _merchant = TextEditingController(text: widget.initial.merchant);
   late final _amount = TextEditingController(
-      text: widget.initial.amount > 0 ? groupThousands(widget.initial.amount) : '');
+    text: widget.initial.amount > 0
+        ? groupThousands(widget.initial.amount)
+        : '',
+  );
   late final _note = TextEditingController(text: widget.initial.note);
   late DateTime _date = widget.initial.date;
   late ExpenseCategory _category = widget.initial.category;
@@ -75,8 +78,15 @@ class _ReviewScreenState extends State<ReviewScreen> {
       lastDate: DateTime.now().add(const Duration(days: 1)),
     );
     if (picked != null) {
-      setState(() => _date = DateTime(
-          picked.year, picked.month, picked.day, _date.hour, _date.minute));
+      setState(
+        () => _date = DateTime(
+          picked.year,
+          picked.month,
+          picked.day,
+          _date.hour,
+          _date.minute,
+        ),
+      );
     }
   }
 
@@ -101,10 +111,13 @@ class _ReviewScreenState extends State<ReviewScreen> {
       }
       _finished = true;
       navigator.pop(true);
-      messenger.showSnackBar(SnackBar(
-        content: Text(
-            '${widget.isNew ? 'Saved' : 'Updated'} ${formatVnd(expense.amount)} · ${expense.merchant}'),
-      ));
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            '${widget.isNew ? 'Saved' : 'Updated'} ${formatVnd(expense.amount)} · ${expense.merchant}',
+          ),
+        ),
+      );
     } catch (e) {
       setState(() => _saving = false);
       messenger.showSnackBar(SnackBar(content: Text('Could not save: $e')));
@@ -136,7 +149,10 @@ class _ReviewScreenState extends State<ReviewScreen> {
     );
     if (!confirmed) return;
     _finished = true;
-    await scope.images.delete(widget.initial.imageFile, widget.initial.thumbFile);
+    await scope.images.delete(
+      widget.initial.imageFile,
+      widget.initial.thumbFile,
+    );
     navigator.pop(false);
   }
 
@@ -152,11 +168,13 @@ class _ReviewScreenState extends State<ReviewScreen> {
         content: Text(message),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel')),
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
           FilledButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: Text(action)),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(action),
+          ),
         ],
       ),
     );
@@ -164,11 +182,11 @@ class _ReviewScreenState extends State<ReviewScreen> {
   }
 
   String? _hint(Confidence? c) => switch (c) {
-        null => null,
-        Confidence.high => 'Auto-detected',
-        Confidence.medium => 'Auto-detected — please verify',
-        Confidence.low => 'Low confidence — please check',
-      };
+    null => null,
+    Confidence.high => 'Auto-detected',
+    Confidence.medium => 'Auto-detected — please verify',
+    Confidence.low => 'Low confidence — please check',
+  };
 
   TextStyle? _hintStyle(Confidence? c) => c == Confidence.low
       ? TextStyle(color: Colors.orange.shade800, fontWeight: FontWeight.w600)
@@ -188,9 +206,11 @@ class _ReviewScreenState extends State<ReviewScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.isNew
-              ? (widget.initial.hasReceipt ? 'Review receipt' : 'New expense')
-              : 'Edit expense'),
+          title: Text(
+            widget.isNew
+                ? (widget.initial.hasReceipt ? 'Review receipt' : 'New expense')
+                : 'Edit expense',
+          ),
           actions: [
             if (!widget.isNew)
               IconButton(
@@ -219,7 +239,8 @@ class _ReviewScreenState extends State<ReviewScreen> {
                       leading: Icon(Icons.text_fields_rounded),
                       title: Text('No text detected'),
                       subtitle: Text(
-                          'Try again with better lighting, or fill the fields manually.'),
+                        'Try again with better lighting, or fill the fields manually.',
+                      ),
                     ),
                   ),
                 ),
@@ -233,16 +254,18 @@ class _ReviewScreenState extends State<ReviewScreen> {
                   helperText: _hint(parsed?.merchantConfidence),
                   helperStyle: _hintStyle(parsed?.merchantConfidence),
                 ),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Enter the merchant name' : null,
+                validator: (v) => (v == null || v.trim().isEmpty)
+                    ? 'Enter the merchant name'
+                    : null,
               ),
               const SizedBox(height: 14),
               TextFormField(
                 controller: _amount,
                 keyboardType: TextInputType.number,
                 inputFormatters: [ThousandsInputFormatter()],
-                style: theme.textTheme.titleLarge
-                    ?.copyWith(fontWeight: FontWeight.w700),
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
                 decoration: InputDecoration(
                   labelText: 'Total amount',
                   prefixIcon: const Icon(Icons.payments_outlined),
@@ -256,8 +279,10 @@ class _ReviewScreenState extends State<ReviewScreen> {
               ),
               if (parsed != null && parsed.amountCandidates.length > 1) ...[
                 const SizedBox(height: 8),
-                Text('Detected amounts — tap to use',
-                    style: theme.textTheme.labelMedium),
+                Text(
+                  'Detected amounts — tap to use',
+                  style: theme.textTheme.labelMedium,
+                ),
                 const SizedBox(height: 4),
                 Wrap(
                   spacing: 8,
@@ -268,7 +293,8 @@ class _ReviewScreenState extends State<ReviewScreen> {
                         label: Text(formatVnd(c.value)),
                         tooltip: '${c.reason}: "${c.line}"',
                         selected: typed == c.value.roundToDouble(),
-                        onSelected: (_) => _amount.text = groupThousands(c.value),
+                        onSelected: (_) =>
+                            _amount.text = groupThousands(c.value),
                       ),
                   ],
                 ),
@@ -284,14 +310,16 @@ class _ReviewScreenState extends State<ReviewScreen> {
                     helperText: parsed == null
                         ? null
                         : parsed.date == null
-                            ? 'No date found — defaulted to today'
-                            : _hint(parsed.dateConfidence),
+                        ? 'No date found — defaulted to today'
+                        : _hint(parsed.dateConfidence),
                     helperStyle: parsed?.date == null
                         ? _hintStyle(Confidence.low)
                         : _hintStyle(parsed?.dateConfidence),
                   ),
-                  child: Text(weekdayDayMonth.format(_date),
-                      style: theme.textTheme.bodyLarge),
+                  child: Text(
+                    weekdayDayMonth.format(_date),
+                    style: theme.textTheme.bodyLarge,
+                  ),
                 ),
               ),
               const SizedBox(height: 18),
@@ -318,13 +346,16 @@ class _ReviewScreenState extends State<ReviewScreen> {
                     leading: const Icon(Icons.document_scanner_outlined),
                     title: const Text('Recognised text'),
                     subtitle: Text(
-                        '${widget.initial.rawText.split('\n').length} lines · on-device ML Kit'),
+                      '${widget.initial.rawText.split('\n').length} lines · on-device ML Kit',
+                    ),
                     childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                     children: [
                       SelectableText(
                         widget.initial.rawText,
-                        style: theme.textTheme.bodySmall
-                            ?.copyWith(fontFamily: 'monospace', height: 1.5),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontFamily: 'monospace',
+                          height: 1.5,
+                        ),
                       ),
                     ],
                   ),
@@ -337,12 +368,15 @@ class _ReviewScreenState extends State<ReviewScreen> {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
             child: FilledButton.icon(
-              style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(54)),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(54),
+              ),
               onPressed: _saving ? null : _save,
               icon: _saving
                   ? const SizedBox.square(
                       dimension: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2))
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
                   : const Icon(Icons.check_rounded),
               label: Text(widget.isNew ? 'Save expense' : 'Save changes'),
             ),
@@ -372,9 +406,9 @@ class _ReceiptPreview extends StatelessWidget {
             Material(
               color: scheme.surfaceContainerHighest,
               child: InkWell(
-                onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => _FullImage(file: file),
-                )),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => _FullImage(file: file)),
+                ),
                 child: Image.file(
                   file,
                   fit: BoxFit.cover,

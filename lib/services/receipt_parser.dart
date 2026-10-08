@@ -68,42 +68,104 @@ class ReceiptParser {
 
   // ---------------------------------------------------------------- amounts
 
-  static final _dateLike =
-      RegExp(r'(?<!\d)\d{1,4}\s*[/\-.]\s*\d{1,2}\s*[/\-.]\s*\d{2,4}(?!\d)');
+  static final _dateLike = RegExp(
+    r'(?<!\d)\d{1,4}\s*[/\-.]\s*\d{1,2}\s*[/\-.]\s*\d{2,4}(?!\d)',
+  );
   static final _timeLike = RegExp(r'(?<!\d)\d{1,2}:\d{2}(?::\d{2})?(?!\d)');
   static final _percent = RegExp(r'\d+(?:[.,]\d+)?\s*%');
-  static final _spacedThousands =
-      RegExp(r'(?<!\d)(\d{1,3})((?: \d{3})+)(?=\s*(?:vnd|vnđ|đ|₫|d\b))');
+  static final _spacedThousands = RegExp(
+    r'(?<!\d)(\d{1,3})((?: \d{3})+)(?=\s*(?:vnd|vnđ|đ|₫|d\b))',
+  );
   static final _money = RegExp(
     r'(?<![\d.,])(\d+(?:[.,]\d+)*)(?!\d)\s*(k(?![a-z])|vnđ|vnd|đồng|dong(?![a-z])|đ|₫|d(?![a-z]))?',
   );
 
   static final _ignoreLine = _words([
-    'mst', 'ma so thue', 'tax code', 'tax id', 'dien thoai', 'dt', 'sdt',
-    'tel', 'hotline', 'fax', 'so hd', 'so hoa don', 'ma hd', 'ma hoa don',
-    'invoice no', 'receipt no', 'stk', 'so tk', 'ma vach', 'barcode', 'www',
-    'http', 'ma don', 'order no', 'ky hieu', 'serial',
+    'mst',
+    'ma so thue',
+    'tax code',
+    'tax id',
+    'dien thoai',
+    'dt',
+    'sdt',
+    'tel',
+    'hotline',
+    'fax',
+    'so hd',
+    'so hoa don',
+    'ma hd',
+    'ma hoa don',
+    'invoice no',
+    'receipt no',
+    'stk',
+    'so tk',
+    'ma vach',
+    'barcode',
+    'www',
+    'http',
+    'ma don',
+    'order no',
+    'ky hieu',
+    'serial',
   ]);
   static final _subtotal = _words([
-    'tam tinh', 'sub total', 'subtotal', 'thanh tien', 'tien hang',
+    'tam tinh',
+    'sub total',
+    'subtotal',
+    'thanh tien',
+    'tien hang',
     'cong tien hang',
   ]);
   static final _strongTotal = _words([
-    'tong cong', 'tong tien', 'tong thanh toan', 'tong so tien',
-    'tong tien thanh toan', 'can thanh toan', 'khach can tra',
-    'khach phai tra', 'phai thanh toan', 'thanh toan', 'grand total',
-    'total amount', 'amount due', 'total due', 'net total', 'total',
+    'tong cong',
+    'tong tien',
+    'tong thanh toan',
+    'tong so tien',
+    'tong tien thanh toan',
+    'can thanh toan',
+    'khach can tra',
+    'khach phai tra',
+    'phai thanh toan',
+    'thanh toan',
+    'grand total',
+    'total amount',
+    'amount due',
+    'total due',
+    'net total',
+    'total',
     'tong hoa don',
   ]);
   static final _weakTotal = _words(['tong', 'sum']);
   static final _negative = _words([
-    'tien khach dua', 'khach dua', 'tien mat', 'cash', 'tien thua',
-    'tien tra lai', 'tra lai', 'thoi lai', 'change', 'giam gia', 'discount',
-    'chiet khau', 'khuyen mai', 'vat', 'thue', 'tax', 'diem', 'points',
-    'so luong', 'sl', 'don gia', 'unit price', 'qty', 'tich luy', 'voucher',
+    'tien khach dua',
+    'khach dua',
+    'tien mat',
+    'cash',
+    'tien thua',
+    'tien tra lai',
+    'tra lai',
+    'thoi lai',
+    'change',
+    'giam gia',
+    'discount',
+    'chiet khau',
+    'khuyen mai',
+    'vat',
+    'thue',
+    'tax',
+    'diem',
+    'points',
+    'so luong',
+    'sl',
+    'don gia',
+    'unit price',
+    'qty',
+    'tich luy',
+    'voucher',
   ]);
-  static final _includesTax =
-      RegExp(r'(da )?(bao )?gom\s*(vat|thue)|incl\.?\s*(vat|tax)');
+  static final _includesTax = RegExp(
+    r'(da )?(bao )?gom\s*(vat|thue)|incl\.?\s*(vat|tax)',
+  );
 
   static RegExp _words(List<String> phrases) {
     final escaped = phrases.map(RegExp.escape).join('|');
@@ -140,7 +202,9 @@ class ReceiptParser {
         .replaceAll(_timeLike, ' ')
         .replaceAll(_percent, ' ')
         .replaceAllMapped(
-            _spacedThousands, (m) => '${m[1]}${m[2]!.replaceAll(' ', '')}');
+          _spacedThousands,
+          (m) => '${m[1]}${m[2]!.replaceAll(' ', '')}',
+        );
 
     final results = <({double value, bool currency})>[];
     for (final m in _money.allMatches(text)) {
@@ -213,13 +277,15 @@ class ReceiptParser {
         if (a.currency) score += 2;
         final isWhole = a.value == a.value.roundToDouble();
         if (a.value < 1000 && !a.currency && isWhole) score -= 4;
-        candidates.add(AmountCandidate(
-          value: a.value,
-          score: score,
-          lineIndex: i,
-          line: lines[i],
-          reason: why,
-        ));
+        candidates.add(
+          AmountCandidate(
+            value: a.value,
+            score: score,
+            lineIndex: i,
+            line: lines[i],
+            reason: why,
+          ),
+        );
       }
       carryBonus = 0;
     }
@@ -227,14 +293,17 @@ class ReceiptParser {
   }
 
   ({double? total, Confidence confidence}) pickTotal(
-      List<AmountCandidate> candidates) {
+    List<AmountCandidate> candidates,
+  ) {
     if (candidates.isEmpty) return (total: null, confidence: Confidence.low);
 
     final best = candidates.reduce((a, b) {
       if (a.score != b.score) return a.score > b.score ? a : b;
       return a.value >= b.value ? a : b;
     });
-    if (best.score >= 6) return (total: best.value, confidence: Confidence.high);
+    if (best.score >= 6) {
+      return (total: best.value, confidence: Confidence.high);
+    }
     if (best.score >= 4) {
       return (total: best.value, confidence: Confidence.medium);
     }
@@ -242,7 +311,9 @@ class ReceiptParser {
     // No reliable "total" label: the grand total is normally the largest
     // non-cash amount on the receipt.
     final plausible = candidates.where((c) => c.score >= 0).toList();
-    if (plausible.isEmpty) return (total: best.value, confidence: Confidence.low);
+    if (plausible.isEmpty) {
+      return (total: best.value, confidence: Confidence.low);
+    }
     final largest = plausible.reduce((a, b) => a.value >= b.value ? a : b);
     return (total: largest.value, confidence: Confidence.low);
   }
@@ -250,14 +321,23 @@ class ReceiptParser {
   // ------------------------------------------------------------------ dates
 
   static final _dmy = RegExp(
-      r'(?<!\d)(\d{1,2})\s*[/\-.]\s*(\d{1,2})\s*[/\-.]\s*(\d{4}|\d{2})(?!\d)');
-  static final _ymd =
-      RegExp(r'(?<!\d)(\d{4})[/\-.](\d{1,2})[/\-.](\d{1,2})(?!\d)');
-  static final _vnWords =
-      RegExp(r'ngay\s*(\d{1,2})\s*thang\s*(\d{1,2})\s*nam\s*(\d{4})');
+    r'(?<!\d)(\d{1,2})\s*[/\-.]\s*(\d{1,2})\s*[/\-.]\s*(\d{4}|\d{2})(?!\d)',
+  );
+  static final _ymd = RegExp(
+    r'(?<!\d)(\d{4})[/\-.](\d{1,2})[/\-.](\d{1,2})(?!\d)',
+  );
+  static final _vnWords = RegExp(
+    r'ngay\s*(\d{1,2})\s*thang\s*(\d{1,2})\s*nam\s*(\d{4})',
+  );
   static final _time = RegExp(r'(?<!\d)([01]?\d|2[0-3])[:h]([0-5]\d)(?!\d)');
-  static final _dateKeyword =
-      _words(['ngay', 'date', 'thoi gian', 'time', 'gio', 'ngay ban']);
+  static final _dateKeyword = _words([
+    'ngay',
+    'date',
+    'thoi gian',
+    'time',
+    'gio',
+    'ngay ban',
+  ]);
 
   static DateTime? _validDate(int y, int m, int d) {
     if (y < 100) y += 2000;
@@ -267,8 +347,10 @@ class ReceiptParser {
     return date;
   }
 
-  ({DateTime? date, Confidence confidence}) findDate(List<String> lines,
-      {required DateTime now}) {
+  ({DateTime? date, Confidence confidence}) findDate(
+    List<String> lines, {
+    required DateTime now,
+  }) {
     DateTime? best;
     var bestScore = -1 << 30;
     final latest = now.add(const Duration(days: 1));
@@ -280,7 +362,11 @@ class ReceiptParser {
       final found = <DateTime>[];
 
       for (final m in _ymd.allMatches(line)) {
-        final d = _validDate(int.parse(m[1]!), int.parse(m[2]!), int.parse(m[3]!));
+        final d = _validDate(
+          int.parse(m[1]!),
+          int.parse(m[2]!),
+          int.parse(m[3]!),
+        );
         if (d != null) found.add(d);
       }
       for (final m in _dmy.allMatches(line)) {
@@ -291,7 +377,11 @@ class ReceiptParser {
         if (d != null) found.add(d);
       }
       for (final m in _vnWords.allMatches(folded)) {
-        final d = _validDate(int.parse(m[3]!), int.parse(m[2]!), int.parse(m[1]!));
+        final d = _validDate(
+          int.parse(m[3]!),
+          int.parse(m[2]!),
+          int.parse(m[1]!),
+        );
         if (d != null) found.add(d);
       }
 
@@ -302,8 +392,13 @@ class ReceiptParser {
         if (date.isBefore(earliest)) score -= 3;
         final t = _time.firstMatch(line);
         if (t != null) {
-          date = DateTime(date.year, date.month, date.day, int.parse(t[1]!),
-              int.parse(t[2]!));
+          date = DateTime(
+            date.year,
+            date.month,
+            date.day,
+            int.parse(t[1]!),
+            int.parse(t[2]!),
+          );
           score += 1;
         }
         if (score > bestScore) {
@@ -323,20 +418,49 @@ class ReceiptParser {
   // --------------------------------------------------------------- merchant
 
   static const _brands = <KnownBrand>[
-    KnownBrand('Co.opmart', ['coopmart', 'co.opmart', 'co.op mart', 'co op mart'], ExpenseCategory.food),
+    KnownBrand('Co.opmart', [
+      'coopmart',
+      'co.opmart',
+      'co.op mart',
+      'co op mart',
+    ], ExpenseCategory.food),
     KnownBrand('Co.opXtra', ['coopxtra', 'co.opxtra'], ExpenseCategory.food),
-    KnownBrand('WinMart', ['winmart', 'winmart+', 'vinmart'], ExpenseCategory.food),
-    KnownBrand('Bách Hóa Xanh', ['bach hoa xanh', 'bachhoaxanh'], ExpenseCategory.food),
+    KnownBrand('WinMart', [
+      'winmart',
+      'winmart+',
+      'vinmart',
+    ], ExpenseCategory.food),
+    KnownBrand('Bách Hóa Xanh', [
+      'bach hoa xanh',
+      'bachhoaxanh',
+    ], ExpenseCategory.food),
     KnownBrand('Circle K', ['circle k'], ExpenseCategory.food),
     KnownBrand('GS25', ['gs25'], ExpenseCategory.food),
-    KnownBrand('7-Eleven', ['7-eleven', '7 eleven', '7eleven'], ExpenseCategory.food),
-    KnownBrand('FamilyMart', ['familymart', 'family mart'], ExpenseCategory.food),
+    KnownBrand('7-Eleven', [
+      '7-eleven',
+      '7 eleven',
+      '7eleven',
+    ], ExpenseCategory.food),
+    KnownBrand('FamilyMart', [
+      'familymart',
+      'family mart',
+    ], ExpenseCategory.food),
     KnownBrand('Ministop', ['ministop'], ExpenseCategory.food),
     KnownBrand('Lotte Mart', ['lotte mart', 'lottemart'], ExpenseCategory.food),
-    KnownBrand('GO! / Big C', ['big c', 'bigc', 'go mart'], ExpenseCategory.food),
+    KnownBrand('GO! / Big C', [
+      'big c',
+      'bigc',
+      'go mart',
+    ], ExpenseCategory.food),
     KnownBrand('AEON', ['aeon'], ExpenseCategory.food),
-    KnownBrand('MM Mega Market', ['mega market', 'mm mega'], ExpenseCategory.food),
-    KnownBrand('Highlands Coffee', ['highlands coffee', 'highlands'], ExpenseCategory.food),
+    KnownBrand('MM Mega Market', [
+      'mega market',
+      'mm mega',
+    ], ExpenseCategory.food),
+    KnownBrand('Highlands Coffee', [
+      'highlands coffee',
+      'highlands',
+    ], ExpenseCategory.food),
     KnownBrand('Phúc Long', ['phuc long'], ExpenseCategory.food),
     KnownBrand('The Coffee House', ['the coffee house'], ExpenseCategory.food),
     KnownBrand('Starbucks', ['starbucks'], ExpenseCategory.food),
@@ -347,21 +471,35 @@ class ReceiptParser {
     KnownBrand('Jollibee', ['jollibee'], ExpenseCategory.food),
     KnownBrand('Pizza Hut', ['pizza hut'], ExpenseCategory.food),
     KnownBrand('Fahasa', ['fahasa'], ExpenseCategory.study),
-    KnownBrand('Nhà sách Phương Nam', ['nha sach phuong nam', 'phuong nam book'], ExpenseCategory.study),
-    KnownBrand('Thế Giới Di Động', ['the gioi di dong', 'thegioididong'], ExpenseCategory.gear),
-    KnownBrand('Điện Máy Xanh', ['dien may xanh', 'dienmayxanh'], ExpenseCategory.gear),
+    KnownBrand('Nhà sách Phương Nam', [
+      'nha sach phuong nam',
+      'phuong nam book',
+    ], ExpenseCategory.study),
+    KnownBrand('Thế Giới Di Động', [
+      'the gioi di dong',
+      'thegioididong',
+    ], ExpenseCategory.gear),
+    KnownBrand('Điện Máy Xanh', [
+      'dien may xanh',
+      'dienmayxanh',
+    ], ExpenseCategory.gear),
     KnownBrand('CellphoneS', ['cellphones'], ExpenseCategory.gear),
     KnownBrand('FPT Shop', ['fpt shop', 'fptshop'], ExpenseCategory.gear),
     KnownBrand('GearVN', ['gearvn'], ExpenseCategory.gear),
     KnownBrand('Phong Vũ', ['phong vu'], ExpenseCategory.gear),
     KnownBrand('CGV', ['cgv'], ExpenseCategory.entertainment),
     KnownBrand('Lotte Cinema', ['lotte cinema'], ExpenseCategory.entertainment),
-    KnownBrand('Galaxy Cinema', ['galaxy cinema', 'galaxy cine'], ExpenseCategory.entertainment),
+    KnownBrand('Galaxy Cinema', [
+      'galaxy cinema',
+      'galaxy cine',
+    ], ExpenseCategory.entertainment),
     KnownBrand('BHD Star', ['bhd star', 'bhd'], ExpenseCategory.entertainment),
     KnownBrand('Grab', ['grab', 'grabfood', 'grabcar'], ExpenseCategory.travel),
     KnownBrand('Petrolimex', ['petrolimex'], ExpenseCategory.travel),
     KnownBrand('Vietjet Air', ['vietjet'], ExpenseCategory.travel),
-    KnownBrand('Vietnam Airlines', ['vietnam airlines'], ExpenseCategory.travel),
+    KnownBrand('Vietnam Airlines', [
+      'vietnam airlines',
+    ], ExpenseCategory.travel),
   ];
 
   static final _brandMatchers = [
@@ -376,9 +514,26 @@ class ReceiptParser {
     r'|lien he|\bgio\b|\btime\b|ma don|order|cam on|thank',
   );
   static final _businessWords = _words([
-    'cong ty', 'cty', 'tnhh', 'co phan', 'store', 'mart', 'shop', 'cafe',
-    'coffee', 'ca phe', 'restaurant', 'nha hang', 'quan', 'sieu thi',
-    'cua hang', 'tap hoa', 'nha sach', 'bakery', 'tiem', 'market',
+    'cong ty',
+    'cty',
+    'tnhh',
+    'co phan',
+    'store',
+    'mart',
+    'shop',
+    'cafe',
+    'coffee',
+    'ca phe',
+    'restaurant',
+    'nha hang',
+    'quan',
+    'sieu thi',
+    'cua hang',
+    'tap hoa',
+    'nha sach',
+    'bakery',
+    'tiem',
+    'market',
   ]);
 
   KnownBrand? _findBrand(List<String> lines) {
@@ -396,9 +551,13 @@ class ReceiptParser {
       .replaceAll(RegExp(r'\s{2,}'), ' ')
       .trim();
 
-  ({String? merchant, Confidence confidence}) findMerchant(List<String> lines,
-      {KnownBrand? brand}) {
-    if (brand != null) return (merchant: brand.name, confidence: Confidence.high);
+  ({String? merchant, Confidence confidence}) findMerchant(
+    List<String> lines, {
+    KnownBrand? brand,
+  }) {
+    if (brand != null) {
+      return (merchant: brand.name, confidence: Confidence.high);
+    }
 
     String? best;
     var bestScore = double.negativeInfinity;
@@ -432,40 +591,152 @@ class ReceiptParser {
 
   static final Map<ExpenseCategory, RegExp> _categoryKeywords = {
     ExpenseCategory.food: _words([
-      'sieu thi', 'mart', 'bach hoa', 'tap hoa', 'coffee', 'cafe', 'ca phe',
-      'tra sua', 'milk tea', 'tea', 'nha hang', 'restaurant', 'quan an', 'com tam',
-      'com ga', 'com chien',
-      'pho', 'bun', 'banh', 'banh mi', 'bakery', 'food', 'do an', 'thuc pham',
-      'rau', 'thit', 'sua', 'pizza', 'ga ran', 'chicken', 'burger', 'mi tom',
-      'nuoc ngot', 'snack', 'trai cay', 'fruit', 'drink', 'tra dao',
+      'sieu thi',
+      'mart',
+      'bach hoa',
+      'tap hoa',
+      'coffee',
+      'cafe',
+      'ca phe',
+      'tra sua',
+      'milk tea',
+      'tea',
+      'nha hang',
+      'restaurant',
+      'quan an',
+      'com tam',
+      'com ga',
+      'com chien',
+      'pho',
+      'bun',
+      'banh',
+      'banh mi',
+      'bakery',
+      'food',
+      'do an',
+      'thuc pham',
+      'rau',
+      'thit',
+      'sua',
+      'pizza',
+      'ga ran',
+      'chicken',
+      'burger',
+      'mi tom',
+      'nuoc ngot',
+      'snack',
+      'trai cay',
+      'fruit',
+      'drink',
+      'tra dao',
     ]),
     ExpenseCategory.study: _words([
-      'nha sach', 'sach', 'book', 'books', 'van phong pham', 'but', 'but bi',
-      'vo', 'tap vo', 'photo', 'photocopy', 'in an', 'hoc phi', 'tuition',
-      'khoa hoc', 'course', 'giao trinh', 'stationery', 'pen', 'notebook',
-      'thuoc ke', 'may tinh casio', 'casio',
+      'nha sach',
+      'sach',
+      'book',
+      'books',
+      'van phong pham',
+      'but',
+      'but bi',
+      'vo',
+      'tap vo',
+      'photo',
+      'photocopy',
+      'in an',
+      'hoc phi',
+      'tuition',
+      'khoa hoc',
+      'course',
+      'giao trinh',
+      'stationery',
+      'pen',
+      'notebook',
+      'thuoc ke',
+      'may tinh casio',
+      'casio',
     ]),
     ExpenseCategory.travel: _words([
-      'taxi', 'xe om', 'bus', 'xe buyt', 've xe', 've tau', 'train',
-      'airlines', 'hang khong', 'flight', 'xang', 'dau diesel', 'ron 95',
-      'gui xe', 'parking', 'hotel', 'khach san', 'homestay', 'booking',
-      'du lich', 'tour', 'toll', 'tram thu phi', 'cau duong', 'nha xe', 'limousine',
+      'taxi',
+      'xe om',
+      'bus',
+      'xe buyt',
+      've xe',
+      've tau',
+      'train',
+      'airlines',
+      'hang khong',
+      'flight',
+      'xang',
+      'dau diesel',
+      'ron 95',
+      'gui xe',
+      'parking',
+      'hotel',
+      'khach san',
+      'homestay',
+      'booking',
+      'du lich',
+      'tour',
+      'toll',
+      'tram thu phi',
+      'cau duong',
+      'nha xe',
+      'limousine',
     ]),
     ExpenseCategory.gear: _words([
-      'dien may', 'laptop', 'chuot', 'mouse', 'ban phim', 'keyboard',
-      'tai nghe', 'headphone', 'earphone', 'sac', 'charger', 'cap sac',
-      'cable', 'usb', 'ssd', 'hdd', 'man hinh', 'monitor', 'op lung',
-      'loa', 'speaker', 'webcam', 'pin du phong', 'power bank', 'router',
+      'dien may',
+      'laptop',
+      'chuot',
+      'mouse',
+      'ban phim',
+      'keyboard',
+      'tai nghe',
+      'headphone',
+      'earphone',
+      'sac',
+      'charger',
+      'cap sac',
+      'cable',
+      'usb',
+      'ssd',
+      'hdd',
+      'man hinh',
+      'monitor',
+      'op lung',
+      'loa',
+      'speaker',
+      'webcam',
+      'pin du phong',
+      'power bank',
+      'router',
     ]),
     ExpenseCategory.entertainment: _words([
-      'cinema', 'rap phim', 'karaoke', 'game', 'bowling', 'billiard', 'bida',
-      'netflix', 'spotify', 'concert', 've xem', 'movie', 'phim', 'bap rang',
-      'popcorn', 'khu vui choi', 'theme park', 'escape room', 'ticket',
+      'cinema',
+      'rap phim',
+      'karaoke',
+      'game',
+      'bowling',
+      'billiard',
+      'bida',
+      'netflix',
+      'spotify',
+      'concert',
+      've xem',
+      'movie',
+      'phim',
+      'bap rang',
+      'popcorn',
+      'khu vui choi',
+      'theme park',
+      'escape room',
+      'ticket',
     ]),
   };
 
   ({ExpenseCategory category, bool matched}) suggestCategory(
-      List<String> lines, {KnownBrand? brand}) {
+    List<String> lines, {
+    KnownBrand? brand,
+  }) {
     final folded = lines.map(fold).join('\n');
     final scores = {for (final c in ExpenseCategory.values) c: 0};
     if (brand != null) scores[brand.category] = scores[brand.category]! + 5;
@@ -473,14 +744,19 @@ class ReceiptParser {
       scores[category] = scores[category]! + re.allMatches(folded).length;
     });
     final best = scores.entries.reduce((a, b) => b.value > a.value ? b : a);
-    if (best.value == 0) return (category: ExpenseCategory.food, matched: false);
+    if (best.value == 0) {
+      return (category: ExpenseCategory.food, matched: false);
+    }
     return (category: best.key, matched: true);
   }
 
   // ------------------------------------------------------------------ entry
 
   ParsedReceipt parse(List<String> rawLines, {DateTime? now}) {
-    final lines = rawLines.map((l) => l.trim()).where((l) => l.isNotEmpty).toList();
+    final lines = rawLines
+        .map((l) => l.trim())
+        .where((l) => l.isNotEmpty)
+        .toList();
     if (lines.isEmpty) return ParsedReceipt(lines: lines);
 
     final brand = _findBrand(lines);
@@ -493,9 +769,11 @@ class ReceiptParser {
     // Distinct values, best first, for the "tap to use" chips on review.
     final seen = <double>{};
     final ranked = [...candidates]
-      ..sort((a, b) => a.score != b.score
-          ? b.score.compareTo(a.score)
-          : b.value.compareTo(a.value));
+      ..sort(
+        (a, b) => a.score != b.score
+            ? b.score.compareTo(a.score)
+            : b.value.compareTo(a.value),
+      );
     final distinct = [
       for (final c in ranked)
         if (c.score > -3 && seen.add(c.value)) c,

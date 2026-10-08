@@ -20,13 +20,19 @@ class CategoryPicker extends StatelessWidget {
       children: [
         for (final c in ExpenseCategory.values)
           ChoiceChip(
-            avatar: Icon(c.icon,
-                size: 18, color: c == selected ? Colors.black87 : c.color),
+            avatar: Icon(
+              c.icon,
+              size: 18,
+              color: c == selected ? Colors.black87 : c.color,
+            ),
             label: Text(c.label),
             selected: c == selected,
             selectedColor: c.color,
             labelStyle: c == selected
-                ? const TextStyle(color: Colors.black87, fontWeight: FontWeight.w600)
+                ? const TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w600,
+                  )
                 : null,
             onSelected: (_) => onChanged(c),
           ),

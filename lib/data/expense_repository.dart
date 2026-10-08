@@ -40,7 +40,8 @@ class SqfliteExpenseRepository implements ExpenseRepository {
         ''');
         await db.execute('CREATE INDEX idx_expenses_date ON $_table(date)');
         await db.execute(
-            'CREATE INDEX idx_expenses_category ON $_table(category)');
+          'CREATE INDEX idx_expenses_category ON $_table(category)',
+        );
       },
     );
     return SqfliteExpenseRepository._(db);
@@ -61,8 +62,12 @@ class SqfliteExpenseRepository implements ExpenseRepository {
 
   @override
   Future<void> update(Expense expense) async {
-    await _db.update(_table, expense.toMap(),
-        where: 'id = ?', whereArgs: [expense.id]);
+    await _db.update(
+      _table,
+      expense.toMap(),
+      where: 'id = ?',
+      whereArgs: [expense.id],
+    );
   }
 
   @override
@@ -83,8 +88,8 @@ class InMemoryExpenseRepository implements ExpenseRepository {
   int _nextId = 0;
 
   @override
-  Future<List<Expense>> fetchAll() async => _rows.values.toList()
-    ..sort((a, b) => b.date.compareTo(a.date));
+  Future<List<Expense>> fetchAll() async =>
+      _rows.values.toList()..sort((a, b) => b.date.compareTo(a.date));
 
   @override
   Future<Expense> insert(Expense expense) async {

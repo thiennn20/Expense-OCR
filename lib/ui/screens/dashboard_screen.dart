@@ -31,10 +31,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   DateTime get _now => widget.now ?? DateTime.now();
 
   (DateTime?, DateTime?) get _range => switch (_period) {
-        Period.week => (startOfWeek(_now), addDays(startOfWeek(_now), 7)),
-        Period.month => (startOfMonth(_now), startOfNextMonth(_now)),
-        Period.all => (null, null),
-      };
+    Period.week => (startOfWeek(_now), addDays(startOfWeek(_now), 7)),
+    Period.month => (startOfMonth(_now), startOfNextMonth(_now)),
+    Period.all => (null, null),
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -50,8 +50,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     final now = _now;
     final monthTotal = store.totalIn(startOfMonth(now), startOfNextMonth(now));
-    final monthCount =
-        store.inRange(startOfMonth(now), startOfNextMonth(now)).length;
+    final monthCount = store
+        .inRange(startOfMonth(now), startOfNextMonth(now))
+        .length;
     final (from, to) = _range;
     final byCategory = store.totalsByCategory(from, to);
     final periodTotal = byCategory.values.fold<double>(0, (a, b) => a + b);
@@ -67,7 +68,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           monthLabel: monthYear.format(now),
           monthTotal: monthTotal,
           receipts: monthCount,
-          weekTotal: store.totalIn(startOfWeek(now), addDays(startOfWeek(now), 7)),
+          weekTotal: store.totalIn(
+            startOfWeek(now),
+            addDays(startOfWeek(now), 7),
+          ),
         ),
         const SizedBox(height: 16),
         _Section(
@@ -97,7 +101,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 onSelected: (c) => setState(() => _selected = c),
                 center: _DonutCenter(
                   label: selected?.label ?? 'Total',
-                  amount: selected == null ? periodTotal : byCategory[selected]!,
+                  amount: selected == null
+                      ? periodTotal
+                      : byCategory[selected]!,
                   percent: selected == null || periodTotal == 0
                       ? null
                       : byCategory[selected]! / periodTotal,
@@ -107,8 +113,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               if (periodTotal == 0)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
-                  child: Text('No expenses in this period',
-                      style: theme.textTheme.bodyMedium),
+                  child: Text(
+                    'No expenses in this period',
+                    style: theme.textTheme.bodyMedium,
+                  ),
                 )
               else
                 for (final c in ExpenseCategory.values)
@@ -152,16 +160,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
               WeeklyBarChart(
                 values: daily,
                 labels: const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                highlightIndex:
-                    todayIndex >= 0 && todayIndex < 7 ? todayIndex : null,
+                highlightIndex: todayIndex >= 0 && todayIndex < 7
+                    ? todayIndex
+                    : null,
               ),
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Expanded(child: _Stat(label: 'Week total', value: formatVnd(weekTotal))),
                   Expanded(
-                      child: _Stat(
-                          label: 'Daily average', value: formatVnd(weekTotal / 7))),
+                    child: _Stat(
+                      label: 'Week total',
+                      value: formatVnd(weekTotal),
+                    ),
+                  ),
+                  Expanded(
+                    child: _Stat(
+                      label: 'Daily average',
+                      value: formatVnd(weekTotal / 7),
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -172,7 +189,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             Text('Recent', style: theme.textTheme.titleMedium),
             const Spacer(),
-            TextButton(onPressed: widget.onSeeAll, child: const Text('See all')),
+            TextButton(
+              onPressed: widget.onSeeAll,
+              child: const Text('See all'),
+            ),
           ],
         ),
         Card(
@@ -211,7 +231,10 @@ class _SummaryCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         gradient: LinearGradient(
-          colors: [scheme.primary, Color.lerp(scheme.primary, scheme.tertiary, 0.6)!],
+          colors: [
+            scheme.primary,
+            Color.lerp(scheme.primary, scheme.tertiary, 0.6)!,
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -219,8 +242,10 @@ class _SummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Spent in $monthLabel',
-              style: TextStyle(color: onPrimary.withValues(alpha: 0.85))),
+          Text(
+            'Spent in $monthLabel',
+            style: TextStyle(color: onPrimary.withValues(alpha: 0.85)),
+          ),
           const SizedBox(height: 6),
           FittedBox(
             fit: BoxFit.scaleDown,
@@ -228,19 +253,27 @@ class _SummaryCard extends StatelessWidget {
             child: Text(
               formatVnd(monthTotal),
               style: TextStyle(
-                  color: onPrimary, fontSize: 34, fontWeight: FontWeight.w800),
+                color: onPrimary,
+                fontSize: 34,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
           const SizedBox(height: 14),
           Row(
             children: [
-              _Pill(icon: Icons.receipt_long_rounded, text: '$receipts receipts', color: onPrimary),
+              _Pill(
+                icon: Icons.receipt_long_rounded,
+                text: '$receipts receipts',
+                color: onPrimary,
+              ),
               const SizedBox(width: 8),
               Flexible(
                 child: _Pill(
-                    icon: Icons.date_range_rounded,
-                    text: 'This week ${formatCompact(weekTotal)}',
-                    color: onPrimary),
+                  icon: Icons.date_range_rounded,
+                  text: 'This week ${formatCompact(weekTotal)}',
+                  color: onPrimary,
+                ),
               ),
             ],
           ),
@@ -271,9 +304,11 @@ class _Pill extends StatelessWidget {
           Icon(icon, size: 16, color: color),
           const SizedBox(width: 6),
           Flexible(
-            child: Text(text,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: color, fontWeight: FontWeight.w600)),
+            child: Text(
+              text,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: color, fontWeight: FontWeight.w600),
+            ),
           ),
         ],
       ),
@@ -309,9 +344,12 @@ class _Section extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(title,
-                          style: theme.textTheme.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.w700)),
+                      Text(
+                        title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                       if (subtitle != null)
                         Text(subtitle!, style: theme.textTheme.bodySmall),
                     ],
@@ -347,12 +385,17 @@ class _DonutCenter extends StatelessWidget {
         children: [
           Text(label, style: theme.textTheme.labelLarge),
           const SizedBox(height: 2),
-          Text(formatCompact(amount),
-              style: theme.textTheme.headlineSmall
-                  ?.copyWith(fontWeight: FontWeight.w800)),
+          Text(
+            formatCompact(amount),
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
           if (percent != null)
-            Text('${(percent! * 100).toStringAsFixed(1)}%',
-                style: theme.textTheme.labelMedium),
+            Text(
+              '${(percent! * 100).toStringAsFixed(1)}%',
+              style: theme.textTheme.labelMedium,
+            ),
         ],
       ),
     );
@@ -392,18 +435,24 @@ class _LegendRow extends StatelessWidget {
             Container(
               width: 12,
               height: 12,
-              decoration:
-                  BoxDecoration(color: category.color, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                color: category.color,
+                shape: BoxShape.circle,
+              ),
             ),
             const SizedBox(width: 10),
             Icon(category.icon, size: 18, color: category.color),
             const SizedBox(width: 8),
             Expanded(child: Text(category.label)),
-            Text('${(share * 100).toStringAsFixed(0)}%',
-                style: theme.textTheme.bodySmall),
+            Text(
+              '${(share * 100).toStringAsFixed(0)}%',
+              style: theme.textTheme.bodySmall,
+            ),
             const SizedBox(width: 12),
-            Text(formatVnd(amount),
-                style: const TextStyle(fontWeight: FontWeight.w600)),
+            Text(
+              formatVnd(amount),
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
           ],
         ),
       ),
@@ -424,9 +473,12 @@ class _Stat extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: theme.textTheme.bodySmall),
-        Text(value,
-            style: theme.textTheme.titleSmall
-                ?.copyWith(fontWeight: FontWeight.w700)),
+        Text(
+          value,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ],
     );
   }
@@ -444,8 +496,11 @@ class _EmptyDashboard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.document_scanner_outlined,
-                size: 88, color: theme.colorScheme.primary),
+            Icon(
+              Icons.document_scanner_outlined,
+              size: 88,
+              color: theme.colorScheme.primary,
+            ),
             const SizedBox(height: 16),
             Text('No expenses yet', style: theme.textTheme.headlineSmall),
             const SizedBox(height: 8),
