@@ -49,9 +49,8 @@ class ExpenseStore extends ChangeNotifier {
 
   Future<void> update(Expense expense) async {
     await _repository.update(expense);
-    _expenses = [
-      for (final e in _expenses) e.id == expense.id ? expense : e,
-    ]..sort(_byDateDesc);
+    _expenses = [for (final e in _expenses) e.id == expense.id ? expense : e]
+      ..sort(_byDateDesc);
     notifyListeners();
   }
 
@@ -76,8 +75,10 @@ class ExpenseStore extends ChangeNotifier {
   // ------------------------------------------------------------ aggregates
 
   Iterable<Expense> inRange(DateTime? from, DateTime? to) => _expenses.where(
-      (e) => (from == null || !e.date.isBefore(from)) &&
-          (to == null || e.date.isBefore(to)));
+    (e) =>
+        (from == null || !e.date.isBefore(from)) &&
+        (to == null || e.date.isBefore(to)),
+  );
 
   double totalIn(DateTime? from, DateTime? to) =>
       inRange(from, to).fold(0, (sum, e) => sum + e.amount);

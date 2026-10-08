@@ -17,8 +17,10 @@ const double donutOrigin = -math.pi / 2;
 
 /// Lays out non-zero [entries] around the circle with a small [gap] between
 /// slices.
-List<DonutSlice<T>> computeSlices<T>(Iterable<MapEntry<T, double>> entries,
-    {double gap = 0.035}) {
+List<DonutSlice<T>> computeSlices<T>(
+  Iterable<MapEntry<T, double>> entries, {
+  double gap = 0.035,
+}) {
   final positive = entries.where((e) => e.value > 0).toList();
   final total = positive.fold<double>(0, (s, e) => s + e.value);
   if (total <= 0) return const [];
@@ -71,16 +73,18 @@ DonutSlice<T>? sliceAtAngle<T>(List<DonutSlice<T>> slices, double angle) {
 double niceStep(double maxValue, int divisions) {
   if (maxValue <= 0) return 1;
   final raw = maxValue / divisions;
-  final magnitude = math.pow(10, (math.log(raw) / math.ln10).floor()).toDouble();
+  final magnitude = math
+      .pow(10, (math.log(raw) / math.ln10).floor())
+      .toDouble();
   final normalised = raw / magnitude;
   final nice = normalised <= 1
       ? 1.0
       : normalised <= 2
-          ? 2.0
-          : normalised <= 2.5
-              ? 2.5
-              : normalised <= 5
-                  ? 5.0
-                  : 10.0;
+      ? 2.0
+      : normalised <= 2.5
+      ? 2.5
+      : normalised <= 5
+      ? 5.0
+      : 10.0;
   return nice * magnitude;
 }

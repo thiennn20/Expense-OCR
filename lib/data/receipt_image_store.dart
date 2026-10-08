@@ -57,7 +57,9 @@ class ReceiptImageStore {
       sourcePath: sourcePath,
       imagePath: p.join(directory, 'receipt_$id.jpg'),
       thumbPath: p.join(directory, 'thumb_$id.jpg'),
-      crop: crop == null ? null : [crop.left, crop.top, crop.right, crop.bottom],
+      crop: crop == null
+          ? null
+          : [crop.left, crop.top, crop.right, crop.bottom],
       previewAspect: previewAspect,
     );
     await compute(_processImage, job);
@@ -128,9 +130,11 @@ void _processImage(_ImageJob job) {
   }
 
   File(job.imagePath).writeAsBytesSync(img.encodeJpg(image, quality: 88));
-  final thumb = img.copyResize(image,
-      width: ReceiptImageStore.thumbWidth,
-      interpolation: img.Interpolation.average);
+  final thumb = img.copyResize(
+    image,
+    width: ReceiptImageStore.thumbWidth,
+    interpolation: img.Interpolation.average,
+  );
   File(job.thumbPath).writeAsBytesSync(img.encodeJpg(thumb, quality: 80));
 }
 
@@ -139,10 +143,20 @@ img.Image _centerCropToAspect(img.Image image, double aspect) {
   if ((current - aspect).abs() < 0.01) return image;
   if (current > aspect) {
     final w = (image.height * aspect).round();
-    return img.copyCrop(image,
-        x: (image.width - w) ~/ 2, y: 0, width: w, height: image.height);
+    return img.copyCrop(
+      image,
+      x: (image.width - w) ~/ 2,
+      y: 0,
+      width: w,
+      height: image.height,
+    );
   }
   final h = (image.width / aspect).round();
-  return img.copyCrop(image,
-      x: 0, y: (image.height - h) ~/ 2, width: image.width, height: h);
+  return img.copyCrop(
+    image,
+    x: 0,
+    y: (image.height - h) ~/ 2,
+    width: image.width,
+    height: h,
+  );
 }

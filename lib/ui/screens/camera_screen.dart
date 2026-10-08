@@ -95,14 +95,16 @@ class _CameraScreenState extends State<CameraScreen>
       }
       setState(() => _controller = controller);
     } on CameraException catch (e) {
-      setState(() => _error = switch (e.code) {
-            'CameraAccessDenied' ||
-            'CameraAccessDeniedWithoutPrompt' ||
-            'CameraAccessRestricted' =>
-              'Camera permission was denied. Enable it in system settings, '
-                  'or import a receipt photo from the gallery.',
-            _ => 'Could not start the camera (${e.description ?? e.code}).',
-          });
+      setState(
+        () => _error = switch (e.code) {
+          'CameraAccessDenied' ||
+          'CameraAccessDeniedWithoutPrompt' ||
+          'CameraAccessRestricted' =>
+            'Camera permission was denied. Enable it in system settings, '
+                'or import a receipt photo from the gallery.',
+          _ => 'Could not start the camera (${e.description ?? e.code}).',
+        },
+      );
     }
   }
 
@@ -175,7 +177,11 @@ class _CameraScreenState extends State<CameraScreen>
     await _process(picked.path);
   }
 
-  Future<void> _process(String path, {Rect? crop, double? previewAspect}) async {
+  Future<void> _process(
+    String path, {
+    Rect? crop,
+    double? previewAspect,
+  }) async {
     final scope = AppScope.read(context);
     try {
       final outcome = await scanReceipt(
@@ -187,13 +193,15 @@ class _CameraScreenState extends State<CameraScreen>
         previewAspect: previewAspect,
       );
       if (!mounted) return;
-      await Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (_) => ReviewScreen(
-          initial: outcome.draft,
-          parsed: outcome.parsed,
-          ocrTime: outcome.ocrTime,
+      await Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => ReviewScreen(
+            initial: outcome.draft,
+            parsed: outcome.parsed,
+            ocrTime: outcome.ocrTime,
+          ),
         ),
-      ));
+      );
     } catch (e) {
       _fail('Could not read the receipt: $e');
     }
@@ -207,24 +215,24 @@ class _CameraScreenState extends State<CameraScreen>
   }
 
   void _manualEntry() {
-    Navigator.of(context).pushReplacement(MaterialPageRoute(
-      builder: (_) => ReviewScreen.manual(),
-    ));
+    Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (_) => ReviewScreen.manual()));
   }
 
   IconData get _flashIcon => switch (_flash) {
-        FlashMode.off => Icons.flash_off_rounded,
-        FlashMode.auto => Icons.flash_auto_rounded,
-        FlashMode.always => Icons.flash_on_rounded,
-        FlashMode.torch => Icons.flashlight_on_rounded,
-      };
+    FlashMode.off => Icons.flash_off_rounded,
+    FlashMode.auto => Icons.flash_auto_rounded,
+    FlashMode.always => Icons.flash_on_rounded,
+    FlashMode.torch => Icons.flashlight_on_rounded,
+  };
 
   String get _flashLabel => switch (_flash) {
-        FlashMode.off => 'Flash off',
-        FlashMode.auto => 'Flash auto',
-        FlashMode.always => 'Flash on',
-        FlashMode.torch => 'Torch',
-      };
+    FlashMode.off => 'Flash off',
+    FlashMode.auto => 'Flash auto',
+    FlashMode.always => 'Flash on',
+    FlashMode.torch => 'Torch',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -252,31 +260,31 @@ class _CameraScreenState extends State<CameraScreen>
   }
 
   Widget _topBar() => Padding(
-        padding: const EdgeInsets.fromLTRB(4, 4, 4, 8),
-        child: Row(
-          children: [
-            IconButton(
-              tooltip: 'Close',
-              color: Colors.white,
-              icon: const Icon(Icons.close_rounded),
-              onPressed: () => Navigator.of(context).maybePop(),
-            ),
-            const Expanded(
-              child: Text(
-                'Align the receipt inside the frame',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white70, fontSize: 14),
-              ),
-            ),
-            IconButton(
-              tooltip: _flashLabel,
-              color: _flash == FlashMode.off ? Colors.white : Colors.amber,
-              icon: Icon(_flashIcon),
-              onPressed: _controller == null ? null : _cycleFlash,
-            ),
-          ],
+    padding: const EdgeInsets.fromLTRB(4, 4, 4, 8),
+    child: Row(
+      children: [
+        IconButton(
+          tooltip: 'Close',
+          color: Colors.white,
+          icon: const Icon(Icons.close_rounded),
+          onPressed: () => Navigator.of(context).maybePop(),
         ),
-      );
+        const Expanded(
+          child: Text(
+            'Align the receipt inside the frame',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white70, fontSize: 14),
+          ),
+        ),
+        IconButton(
+          tooltip: _flashLabel,
+          color: _flash == FlashMode.off ? Colors.white : Colors.amber,
+          icon: Icon(_flashIcon),
+          onPressed: _controller == null ? null : _cycleFlash,
+        ),
+      ],
+    ),
+  );
 
   Widget _viewfinder(Color accent) {
     final controller = _controller;
@@ -288,65 +296,69 @@ class _CameraScreenState extends State<CameraScreen>
       );
     }
     if (controller == null || !controller.value.isInitialized) {
-      return const Center(child: CircularProgressIndicator(color: Colors.white));
+      return const Center(
+        child: CircularProgressIndicator(color: Colors.white),
+      );
     }
     // Portrait: the sensor's landscape aspect ratio is inverted.
     final aspect = 1 / controller.value.aspectRatio;
     return Center(
       child: AspectRatio(
         aspectRatio: aspect,
-        child: LayoutBuilder(builder: (context, constraints) {
-          final size = constraints.biggest;
-          _previewSize = size;
-          return GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTapUp: (d) => _focusAt(d.localPosition, size),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                ClipRect(child: CameraPreview(controller)),
-                CustomPaint(painter: CropOverlayPainter(accent: accent)),
-                if (_focusPoint != null)
-                  Positioned(
-                    left: _focusPoint!.dx - 32,
-                    top: _focusPoint!.dy - 32,
-                    child: _FocusRing(key: ValueKey(_focusTick)),
-                  ),
-              ],
-            ),
-          );
-        }),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final size = constraints.biggest;
+            _previewSize = size;
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTapUp: (d) => _focusAt(d.localPosition, size),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  ClipRect(child: CameraPreview(controller)),
+                  CustomPaint(painter: CropOverlayPainter(accent: accent)),
+                  if (_focusPoint != null)
+                    Positioned(
+                      left: _focusPoint!.dx - 32,
+                      top: _focusPoint!.dy - 32,
+                      child: _FocusRing(key: ValueKey(_focusTick)),
+                    ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
 
   Widget _bottomBar(Color accent) => Padding(
-        padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            TextButton.icon(
-              style: TextButton.styleFrom(foregroundColor: Colors.white),
-              onPressed: _processing ? null : _pickFromGallery,
-              icon: const Icon(Icons.photo_library_outlined),
-              label: const Text('Gallery'),
-            ),
-            _ShutterButton(
-              enabled: !_processing && _controller != null,
-              onPressed: () {
-                final size = _previewSize;
-                if (size != null) _capture(size);
-              },
-            ),
-            TextButton.icon(
-              style: TextButton.styleFrom(foregroundColor: Colors.white),
-              onPressed: _processing ? null : _manualEntry,
-              icon: const Icon(Icons.edit_note_rounded),
-              label: const Text('Manual'),
-            ),
-          ],
+    padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        TextButton.icon(
+          style: TextButton.styleFrom(foregroundColor: Colors.white),
+          onPressed: _processing ? null : _pickFromGallery,
+          icon: const Icon(Icons.photo_library_outlined),
+          label: const Text('Gallery'),
         ),
-      );
+        _ShutterButton(
+          enabled: !_processing && _controller != null,
+          onPressed: () {
+            final size = _previewSize;
+            if (size != null) _capture(size);
+          },
+        ),
+        TextButton.icon(
+          style: TextButton.styleFrom(foregroundColor: Colors.white),
+          onPressed: _processing ? null : _manualEntry,
+          icon: const Icon(Icons.edit_note_rounded),
+          label: const Text('Manual'),
+        ),
+      ],
+    ),
+  );
 }
 
 class _ShutterButton extends StatelessWidget {
@@ -418,8 +430,10 @@ class _ProcessingOverlay extends StatelessWidget {
           children: [
             CircularProgressIndicator(color: Colors.white),
             SizedBox(height: 16),
-            Text('Reading receipt on-device…',
-                style: TextStyle(color: Colors.white, fontSize: 16)),
+            Text(
+              'Reading receipt on-device…',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
           ],
         ),
       ),
@@ -446,17 +460,25 @@ class _CameraError extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.no_photography_outlined,
-                color: Colors.white70, size: 56),
+            const Icon(
+              Icons.no_photography_outlined,
+              color: Colors.white70,
+              size: 56,
+            ),
             const SizedBox(height: 16),
-            Text(message,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white)),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white),
+            ),
             const SizedBox(height: 24),
             Wrap(
               spacing: 12,
               children: [
-                OutlinedButton(onPressed: onRetry, child: const Text('Try again')),
+                OutlinedButton(
+                  onPressed: onRetry,
+                  child: const Text('Try again'),
+                ),
                 FilledButton.icon(
                   onPressed: onGallery,
                   icon: const Icon(Icons.photo_library_outlined),

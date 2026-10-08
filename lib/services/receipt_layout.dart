@@ -2,7 +2,8 @@
 ///
 /// Kept independent of `dart:ui` / ML Kit so the layout logic is unit-testable.
 class OcrLine {
-  const OcrLine(this.text, {
+  const OcrLine(
+    this.text, {
     required this.left,
     required this.top,
     required this.right,
@@ -40,7 +41,8 @@ List<String> mergeIntoRows(List<OcrLine> lines) {
           row.map((l) => l.height).reduce((a, b) => a + b) / row.length;
       // Half a line height of tolerance absorbs slight camera skew without
       // collapsing two genuinely different rows into one.
-      final tolerance = 0.5 * (rowHeight < line.height ? rowHeight : line.height);
+      final tolerance =
+          0.5 * (rowHeight < line.height ? rowHeight : line.height);
       if ((line.centerY - rowCenter).abs() <= tolerance) {
         row.add(line);
         continue;

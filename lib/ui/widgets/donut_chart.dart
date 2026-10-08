@@ -34,18 +34,26 @@ class DonutChart extends StatefulWidget {
 
 class _DonutChartState extends State<DonutChart> with TickerProviderStateMixin {
   late final AnimationController _intro = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 1100))
-    ..forward();
+    vsync: this,
+    duration: const Duration(milliseconds: 1100),
+  )..forward();
   late final AnimationController _selection = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 280));
+    vsync: this,
+    duration: const Duration(milliseconds: 280),
+  );
 
-  late final Animation<double> _introCurve =
-      CurvedAnimation(parent: _intro, curve: Curves.easeOutCubic);
-  late final Animation<double> _selectionCurve =
-      CurvedAnimation(parent: _selection, curve: Curves.easeOutBack);
+  late final Animation<double> _introCurve = CurvedAnimation(
+    parent: _intro,
+    curve: Curves.easeOutCubic,
+  );
+  late final Animation<double> _selectionCurve = CurvedAnimation(
+    parent: _selection,
+    curve: Curves.easeOutBack,
+  );
 
-  late List<DonutSlice<ExpenseCategory>> _slices =
-      computeSlices(widget.values.entries);
+  late List<DonutSlice<ExpenseCategory>> _slices = computeSlices(
+    widget.values.entries,
+  );
 
   @override
   void didUpdateWidget(DonutChart oldWidget) {
@@ -70,16 +78,17 @@ class _DonutChartState extends State<DonutChart> with TickerProviderStateMixin {
     final c = Offset(widget.size / 2, widget.size / 2);
     final v = details.localPosition - c;
     final geometry = _DonutGeometry(widget.size);
-    final inRing = v.distance >= geometry.radius - geometry.thickness / 2 - 10 &&
+    final inRing =
+        v.distance >= geometry.radius - geometry.thickness / 2 - 10 &&
         v.distance <= geometry.radius + geometry.thickness / 2 + 16;
     if (!inRing) {
       widget.onSelected(null);
       return;
     }
     final slice = sliceAtAngle(_slices, math.atan2(v.dy, v.dx));
-    widget.onSelected(slice == null || slice.key == widget.selected
-        ? null
-        : slice.key);
+    widget.onSelected(
+      slice == null || slice.key == widget.selected ? null : slice.key,
+    );
   }
 
   @override
@@ -110,9 +119,7 @@ class _DonutChartState extends State<DonutChart> with TickerProviderStateMixin {
 }
 
 class _DonutGeometry {
-  _DonutGeometry(double size)
-      : radius = size / 2 - 14,
-        thickness = size * 0.13;
+  _DonutGeometry(double size) : radius = size / 2 - 14, thickness = size * 0.13;
 
   final double radius;
   final double thickness;

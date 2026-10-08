@@ -29,8 +29,9 @@ class OcrService {
 
   Future<OcrResult> recognizeFile(String path) async {
     final stopwatch = Stopwatch()..start();
-    final recognized =
-        await _instance.processImage(InputImage.fromFilePath(path));
+    final recognized = await _instance.processImage(
+      InputImage.fromFilePath(path),
+    );
     stopwatch.stop();
 
     final lines = <OcrLine>[

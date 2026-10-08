@@ -11,7 +11,17 @@ chart, both drawn with `CustomPainter`.
 
 ## Download
 
-Release APKs: [https://github.com/thiennn20/Expense-OCR/releases/latest](https://github.com/thiennn20/Expense-OCR/releases/latest)
+- [Latest release](https://github.com/thiennn20/Expense-OCR/releases/latest)
+- [Download Android APK (v1.0.0 asset)](https://github.com/thiennn20/Expense-OCR/releases/latest/download/Expense-OCR-v1.0.0.apk)
+
+No release has been published yet. These links become available after the first
+successful tag workflow. Use **Latest release** as the main download link:
+the universal APK is named `Expense-OCR-<tag>.apk`, so the direct link above
+only works while the latest release contains `Expense-OCR-v1.0.0.apk`.
+For a permanent v1.0.0 link, use
+[`Expense-OCR-v1.0.0.apk`](https://github.com/thiennn20/Expense-OCR/releases/download/v1.0.0/Expense-OCR-v1.0.0.apk)
+after v1.0.0 has been published. Allow installation from your browser/file manager
+when Android prompts you, then install the APK.
 
 ![Screens](docs/screenshots/01_dashboard.png)
 
@@ -29,7 +39,7 @@ Release APKs: [https://github.com/thiennn20/Expense-OCR/releases/latest](https:/
 
 ## Build & run
 
-Requirements: Flutter **3.x** (tested on 3.47.6 / Dart 3.13), Android SDK 36,
+Requirements: Flutter **3.47.6** (Dart >=3.13.5), Android SDK 36,
 JDK 17. You need a physical Android device or an emulator with a camera
 (ML Kit does not run on desktop or web).
 
@@ -86,7 +96,61 @@ screenshot_test/                  # renders docs/screenshots/*.png
 docs/                             # technical report + screenshots
 ```
 
-## Release notes
+## Build and publish Android APKs
+
+The [Android workflow](https://github.com/thiennn20/Expense-OCR/actions/workflows/android-release.yml)
+uses Ubuntu, Java 17 and Flutter 3.47.6, with Flutter/pub and Gradle caches.
+It runs `flutter doctor -v`, `flutter pub get`, the Dart format check,
+`flutter analyze` and `flutter test` before building. Failed checks stop the build
+and prevent publication. The lockfile must remain unchanged after dependency resolution.
+
+Pull requests into `main` run the same checks and APK builds. In Actions, select
+**Android APK and release → Run workflow**, choose a branch and enter a version
+such as `v1.0.0` to build without publishing. Manual runs only upload artifacts,
+even when the selected ref is a tag. Artifacts are retained for 14 days.
+
+After merging the workflow PR into `main`, publish the first version with:
+
+```bash
+git switch main
+git pull --ff-only origin main
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+Pushing a `v*` tag triggers checks, both APK builds, artifact upload, then an
+official GitHub Release with four APK assets. Use stable `vMAJOR.MINOR.PATCH`
+versions; invalid versions fail before building. The tag/input supplies the APK
+version name, while `pubspec.yaml` supplies the Android build number. Increase
+the build number in `pubspec.yaml` before subsequent releases.
+
+| Flutter output | Artifact / release asset |
+|---|---|
+| `build/app/outputs/flutter-apk/app-release.apk` | `Expense-OCR-<tag>.apk` (universal) |
+| `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk` | `app-arm64-v8a-release.apk` |
+| `build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk` | `app-armeabi-v7a-release.apk` |
+| `build/app/outputs/flutter-apk/app-x86_64-release.apk` | `app-x86_64-release.apk` |
+
+The universal APK is copied before the split build so it remains available.
+Build jobs have read-only repository permissions; only the tag-triggered release
+job receives `contents: write`. Rerunning a successful tag workflow replaces its
+assets and release notes.
+
+### Signing and limitations
+
+The current release build uses **debug signing** for coursework sideloading.
+It is **not suitable for Google Play**. Clean runners may create different debug
+keys, so a future APK may require uninstalling the previous app, deleting its
+local expenses and receipt images. A persistent release keystore should be
+configured before production: store the encoded keystore and passwords in
+GitHub Secrets, decode the keystore only on the runner and configure the Gradle
+release signing configuration there. Never commit `.jks`, `.keystore` or
+`key.properties` files; they are ignored throughout this repository.
+
+OCR uses the Latin model and requires Android/iOS, not desktop/web. Results
+depend on image quality and receipt layout; always verify the parsed fields.
+
+### Android build configuration
 
 * `android/app/proguard-rules.pro` keeps R8 from failing on the optional
   Chinese, Japanese, Korean and Devanagari ML Kit recognisers, which the plugin

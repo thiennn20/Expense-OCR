@@ -14,8 +14,12 @@ Rect receiptFrame(Size size) {
 /// The frame as 0..1 fractions of the preview, used to crop the still photo.
 Rect frameFractions(Size size) {
   final f = receiptFrame(size);
-  return Rect.fromLTRB(f.left / size.width, f.top / size.height,
-      f.right / size.width, f.bottom / size.height);
+  return Rect.fromLTRB(
+    f.left / size.width,
+    f.top / size.height,
+    f.right / size.width,
+    f.bottom / size.height,
+  );
 }
 
 /// Dims everything outside the framing rectangle and draws corner brackets.
@@ -33,7 +37,10 @@ class CropOverlayPainter extends CustomPainter {
       ..fillType = PathFillType.evenOdd
       ..addRect(Offset.zero & size)
       ..addRRect(rrect);
-    canvas.drawPath(shade, Paint()..color = Colors.black.withValues(alpha: 0.55));
+    canvas.drawPath(
+      shade,
+      Paint()..color = Colors.black.withValues(alpha: 0.55),
+    );
 
     canvas.drawRRect(
       rrect,

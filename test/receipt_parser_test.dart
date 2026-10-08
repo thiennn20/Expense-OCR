@@ -41,7 +41,8 @@ void main() {
 
     test('extractAmounts ignores dates, times, phones and percentages', () {
       final found = ReceiptParser.extractAmounts(
-          'Ngày 05/10/2026 14:32  ĐT 0905123456  VAT 10%  150.000 đ');
+        'Ngày 05/10/2026 14:32  ĐT 0905123456  VAT 10%  150.000 đ',
+      );
       expect(found.map((a) => a.value), [150000]);
       expect(found.single.currency, isTrue);
     });
@@ -148,8 +149,10 @@ void main() {
     });
 
     test('Vietnamese long-form date', () {
-      final r = parser.parse(
-          ['Ngày 07 tháng 10 năm 2026', 'Tổng cộng 10.000'], now: now);
+      final r = parser.parse([
+        'Ngày 07 tháng 10 năm 2026',
+        'Tổng cộng 10.000',
+      ], now: now);
       expect(r.date, DateTime(2026, 10, 7));
     });
 

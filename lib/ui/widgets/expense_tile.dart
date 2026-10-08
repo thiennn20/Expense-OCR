@@ -57,14 +57,19 @@ class ExpenseTile extends StatelessWidget {
           ),
           if (expense.hasReceipt) ...[
             const SizedBox(width: 6),
-            Icon(Icons.receipt_long_rounded,
-                size: 14, color: theme.colorScheme.outline),
+            Icon(
+              Icons.receipt_long_rounded,
+              size: 14,
+              color: theme.colorScheme.outline,
+            ),
           ],
         ],
       ),
       trailing: Text(
         '-${formatVnd(expense.amount)}',
-        style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+        style: theme.textTheme.titleSmall?.copyWith(
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }

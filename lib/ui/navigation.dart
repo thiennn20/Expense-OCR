@@ -6,11 +6,13 @@ import '../models/expense.dart';
 import 'screens/camera_screen.dart';
 import 'screens/review_screen.dart';
 
-void openCamera(BuildContext context) => Navigator.of(context)
-    .push(MaterialPageRoute(builder: (_) => const CameraScreen()));
+void openCamera(BuildContext context) =>
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => const CameraScreen()));
 
-void openManualEntry(BuildContext context) => Navigator.of(context)
-    .push(MaterialPageRoute(builder: (_) => ReviewScreen.manual()));
+void openManualEntry(BuildContext context) =>
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => ReviewScreen.manual()));
 
 void openEdit(BuildContext context, Expense expense) => Navigator.of(context)
     .push(MaterialPageRoute(builder: (_) => ReviewScreen(initial: expense)));
@@ -23,10 +25,14 @@ Future<void> deleteWithUndo(BuildContext context, Expense expense) async {
   await store.remove(expense);
   messenger.hideCurrentSnackBar();
   final reason = await messenger
-      .showSnackBar(SnackBar(
-        content: Text('Deleted ${expense.merchant} · ${formatVnd(expense.amount)}'),
-        action: SnackBarAction(label: 'Undo', onPressed: () {}),
-      ))
+      .showSnackBar(
+        SnackBar(
+          content: Text(
+            'Deleted ${expense.merchant} · ${formatVnd(expense.amount)}',
+          ),
+          action: SnackBarAction(label: 'Undo', onPressed: () {}),
+        ),
+      )
       .closed;
   if (reason == SnackBarClosedReason.action) {
     await store.restore(expense);

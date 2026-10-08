@@ -32,10 +32,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final query = fold(_search.text.trim());
     return all
         .where((e) => _filter == null || e.category == _filter)
-        .where((e) =>
-            query.isEmpty ||
-            fold(e.merchant).contains(query) ||
-            fold(e.note).contains(query))
+        .where(
+          (e) =>
+              query.isEmpty ||
+              fold(e.merchant).contains(query) ||
+              fold(e.note).contains(query),
+        )
         .toList();
   }
 
@@ -103,13 +105,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
           child: Row(
             children: [
-              Text('${items.length} transactions',
-                  style: theme.textTheme.bodySmall),
+              Text(
+                '${items.length} transactions',
+                style: theme.textTheme.bodySmall,
+              ),
               const Spacer(),
               Text(
                 formatVnd(items.fold<double>(0, (s, e) => s + e.amount)),
-                style: theme.textTheme.titleSmall
-                    ?.copyWith(fontWeight: FontWeight.w700),
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ],
           ),
@@ -117,9 +122,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
         Expanded(
           child: items.isEmpty
               ? Center(
-                  child: Text(store.expenses.isEmpty
-                      ? 'No expenses yet'
-                      : 'No matching expenses'),
+                  child: Text(
+                    store.expenses.isEmpty
+                        ? 'No expenses yet'
+                        : 'No matching expenses',
+                  ),
                 )
               : ListView.builder(
                   padding: const EdgeInsets.only(bottom: 96),
@@ -134,11 +141,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
                         child: Row(
                           children: [
-                            Text(weekdayDayMonth.format(row),
-                                style: theme.textTheme.labelLarge),
+                            Text(
+                              weekdayDayMonth.format(row),
+                              style: theme.textTheme.labelLarge,
+                            ),
                             const Spacer(),
-                            Text(formatVnd(dayTotal),
-                                style: theme.textTheme.labelLarge),
+                            Text(
+                              formatVnd(dayTotal),
+                              style: theme.textTheme.labelLarge,
+                            ),
                           ],
                         ),
                       );
@@ -151,12 +162,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         color: theme.colorScheme.errorContainer,
                         alignment: Alignment.centerRight,
                         padding: const EdgeInsets.only(right: 24),
-                        child: Icon(Icons.delete_outline_rounded,
-                            color: theme.colorScheme.onErrorContainer),
+                        child: Icon(
+                          Icons.delete_outline_rounded,
+                          color: theme.colorScheme.onErrorContainer,
+                        ),
                       ),
                       onDismissed: (_) => deleteWithUndo(context, e),
                       child: ExpenseTile(
-                          expense: e, onTap: () => openEdit(context, e)),
+                        expense: e,
+                        onTap: () => openEdit(context, e),
+                      ),
                     );
                   },
                 ),

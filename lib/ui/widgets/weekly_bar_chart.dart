@@ -31,8 +31,9 @@ class WeeklyBarChart extends StatefulWidget {
 class _WeeklyBarChartState extends State<WeeklyBarChart>
     with SingleTickerProviderStateMixin {
   late final AnimationController _grow = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 900))
-    ..forward();
+    vsync: this,
+    duration: const Duration(milliseconds: 900),
+  )..forward();
   int? _selected;
 
   @override
@@ -53,7 +54,9 @@ class _WeeklyBarChartState extends State<WeeklyBarChart>
   void _handleTap(TapUpDetails d, Size size) {
     final layout = _BarLayout(size, widget.values.length);
     final index = layout.indexAt(d.localPosition.dx);
-    setState(() => _selected = (index == null || index == _selected) ? null : index);
+    setState(
+      () => _selected = (index == null || index == _selected) ? null : index,
+    );
   }
 
   @override
@@ -61,41 +64,42 @@ class _WeeklyBarChartState extends State<WeeklyBarChart>
     assert(widget.values.length == widget.labels.length);
     final theme = Theme.of(context);
     return Semantics(
-      label: 'Weekly spending bar chart. '
-          '${[
-        for (var i = 0; i < widget.values.length; i++)
-          '${widget.labels[i]}: ${formatVnd(widget.values[i])}'
-      ].join(', ')}',
-      child: LayoutBuilder(builder: (context, constraints) {
-        final size = Size(constraints.maxWidth, widget.height);
-        return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTapUp: (d) => _handleTap(d, size),
-          child: CustomPaint(
-            size: size,
-            painter: _BarPainter(
-              values: widget.values,
-              labels: widget.labels,
-              highlightIndex: widget.highlightIndex,
-              selectedIndex: _selected,
-              progress: _grow,
-              barColor: theme.colorScheme.primary,
-              gridColor: theme.colorScheme.outlineVariant,
-              labelStyle: theme.textTheme.labelSmall!
-                  .copyWith(color: theme.colorScheme.onSurfaceVariant),
-              tooltipColor: theme.colorScheme.inverseSurface,
-              tooltipTextColor: theme.colorScheme.onInverseSurface,
+      label:
+          'Weekly spending bar chart. '
+          '${[for (var i = 0; i < widget.values.length; i++) '${widget.labels[i]}: ${formatVnd(widget.values[i])}'].join(', ')}',
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final size = Size(constraints.maxWidth, widget.height);
+          return GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTapUp: (d) => _handleTap(d, size),
+            child: CustomPaint(
+              size: size,
+              painter: _BarPainter(
+                values: widget.values,
+                labels: widget.labels,
+                highlightIndex: widget.highlightIndex,
+                selectedIndex: _selected,
+                progress: _grow,
+                barColor: theme.colorScheme.primary,
+                gridColor: theme.colorScheme.outlineVariant,
+                labelStyle: theme.textTheme.labelSmall!.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                tooltipColor: theme.colorScheme.inverseSurface,
+                tooltipTextColor: theme.colorScheme.onInverseSurface,
+              ),
             ),
-          ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 }
 
 class _BarLayout {
   _BarLayout(this.size, this.count)
-      : plot = Rect.fromLTRB(40, 30, size.width - 4, size.height - 24);
+    : plot = Rect.fromLTRB(40, 30, size.width - 4, size.height - 24);
 
   final Size size;
   final int count;
@@ -138,9 +142,10 @@ class _BarPainter extends CustomPainter {
 
   static const _divisions = 4;
 
-  TextPainter _text(String s, TextStyle style) =>
-      TextPainter(text: TextSpan(text: s, style: style), textDirection: TextDirection.ltr)
-        ..layout();
+  TextPainter _text(String s, TextStyle style) => TextPainter(
+    text: TextSpan(text: s, style: style),
+    textDirection: TextDirection.ltr,
+  )..layout();
 
   /// Staggered growth: bar i starts 60 ms after bar i-1.
   double _barProgress(int i) {
@@ -163,24 +168,43 @@ class _BarPainter extends CustomPainter {
       ..strokeWidth = 1;
     for (var i = 0; i <= _divisions; i++) {
       final y = plot.bottom - plot.height * i / _divisions;
-      _dashedLine(canvas, Offset(plot.left, y), Offset(plot.right, y), gridPaint);
-      final label = _text(maxValue == 0 ? '0' : formatCompact(step * i), labelStyle);
-      label.paint(canvas, Offset(plot.left - label.width - 8, y - label.height / 2));
+      _dashedLine(
+        canvas,
+        Offset(plot.left, y),
+        Offset(plot.right, y),
+        gridPaint,
+      );
+      final label = _text(
+        maxValue == 0 ? '0' : formatCompact(step * i),
+        labelStyle,
+      );
+      label.paint(
+        canvas,
+        Offset(plot.left - label.width - 8, y - label.height / 2),
+      );
     }
 
     // Bars + X labels.
     for (var i = 0; i < values.length; i++) {
       final cx = layout.centerX(i);
-      final h = top == 0 ? 0.0 : plot.height * (values[i] / top) * _barProgress(i);
+      final h = top == 0
+          ? 0.0
+          : plot.height * (values[i] / top) * _barProgress(i);
       final emphasised = i == highlightIndex || i == selectedIndex;
       final paint = Paint()
         ..color = emphasised ? barColor : barColor.withValues(alpha: 0.4);
       if (h > 0) {
-        final r = Rect.fromLTRB(cx - layout.barWidth / 2, plot.bottom - h,
-            cx + layout.barWidth / 2, plot.bottom);
+        final r = Rect.fromLTRB(
+          cx - layout.barWidth / 2,
+          plot.bottom - h,
+          cx + layout.barWidth / 2,
+          plot.bottom,
+        );
         final radius = Radius.circular(layout.barWidth / 3);
         canvas.drawRRect(
-            RRect.fromRectAndCorners(r, topLeft: radius, topRight: radius), paint);
+          RRect.fromRectAndCorners(r, topLeft: radius, topRight: radius),
+          paint,
+        );
       }
 
       final style = i == highlightIndex
@@ -196,7 +220,9 @@ class _BarPainter extends CustomPainter {
 
   void _tooltip(Canvas canvas, _BarLayout layout, int i, double top) {
     final plot = layout.plot;
-    final h = top == 0 ? 0.0 : plot.height * (values[i] / top) * _barProgress(i);
+    final h = top == 0
+        ? 0.0
+        : plot.height * (values[i] / top) * _barProgress(i);
     final text = _text(
       formatVnd(values[i]),
       labelStyle.copyWith(color: tooltipTextColor, fontWeight: FontWeight.w600),
@@ -206,7 +232,9 @@ class _BarPainter extends CustomPainter {
     left = left.clamp(0.0, layout.size.width - w);
     final bottom = (plot.bottom - h - 6).clamp(th, layout.size.height);
     final bubble = RRect.fromRectAndRadius(
-        Rect.fromLTWH(left, bottom - th, w, th), const Radius.circular(8));
+      Rect.fromLTWH(left, bottom - th, w, th),
+      const Radius.circular(8),
+    );
     canvas.drawRRect(bubble, Paint()..color = tooltipColor);
     text.paint(canvas, Offset(left + 8, bottom - th + 4));
   }
@@ -215,7 +243,11 @@ class _BarPainter extends CustomPainter {
     const dash = 4.0, gap = 4.0;
     var x = a.dx;
     while (x < b.dx) {
-      canvas.drawLine(Offset(x, a.dy), Offset((x + dash).clamp(a.dx, b.dx), a.dy), paint);
+      canvas.drawLine(
+        Offset(x, a.dy),
+        Offset((x + dash).clamp(a.dx, b.dx), a.dy),
+        paint,
+      );
       x += dash + gap;
     }
   }
