@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ocr_expense_tracker/models/expense_category.dart';
-import 'package:ocr_expense_tracker/services/receipt_layout.dart';
-import 'package:ocr_expense_tracker/services/receipt_parser.dart';
-import 'package:ocr_expense_tracker/services/text_utils.dart';
+import 'package:expense_ocr/models/expense_category.dart';
+import 'package:expense_ocr/services/receipt_layout.dart';
+import 'package:expense_ocr/services/receipt_parser.dart';
+import 'package:expense_ocr/services/text_utils.dart';
 
 void main() {
   const parser = ReceiptParser();

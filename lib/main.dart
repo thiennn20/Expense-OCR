@@ -39,7 +39,7 @@ class ExpenseApp extends StatelessWidget {
       images: images,
       ocr: ocr,
       child: MaterialApp(
-        title: 'Receipt Expenses',
+        title: 'Expense-OCR',
         debugShowCheckedModeBanner: false,
         theme: buildTheme(Brightness.light),
         darkTheme: buildTheme(Brightness.dark),

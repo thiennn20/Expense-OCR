@@ -9,8 +9,8 @@
 ## 1. GENERAL INFORMATION & DELIVERABLE LINKS
 * **Team Members:**
   1. Nguyễn Phan Nhật Quang — Student ID: 23IT.B176 — Role: Individual project (architecture, OCR & parser, database, UI/charts, testing) — Contribution: 100%
-* **🔗 Live Demo URL (Release APK):** [app-release.apk](https://github.com/nquang510/miniproject_orc/releases/download/v1.0.0/app-release.apk) (universal) · [arm64-v8a build, 31.9 MB](https://github.com/nquang510/miniproject_orc/releases/download/v1.0.0/app-arm64-v8a-release.apk) · [Release page](https://github.com/nquang510/miniproject_orc/releases/tag/v1.0.0)
-* **💻 GitHub Repository:** [https://github.com/nquang510/miniproject_orc](https://github.com/nquang510/miniproject_orc)
+* **🔗 Live Demo URL (Release APK):** [app-release.apk](https://github.com/thiennn20/Expense-OCR/releases/download/v1.0.0/app-release.apk) (universal) · [arm64-v8a build, 31.9 MB](https://github.com/thiennn20/Expense-OCR/releases/download/v1.0.0/app-arm64-v8a-release.apk) · [Release page](https://github.com/thiennn20/Expense-OCR/releases/tag/v1.0.0)
+* **💻 GitHub Repository:** [https://github.com/thiennn20/Expense-OCR.git](https://github.com/thiennn20/Expense-OCR.git)
 
 **Tech stack:** Flutter 3.47.6 · Dart 3.13 · `camera` · `google_mlkit_text_recognition` (on-device Latin model) · `sqflite` · `image` · `CustomPainter` (no chart library).
 

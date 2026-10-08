@@ -1,4 +1,4 @@
-# Receipt Expenses — OCR Expense Tracker & Receipt Parser
+# Expense-OCR — OCR Expense Tracker & Receipt Parser
 
 Mini-Project 3 · Cross-Platform Mobile App Development (VKU)
 Author: **Nguyễn Phan Nhật Quang** — 23IT.B176
@@ -11,7 +11,7 @@ chart, both drawn with `CustomPainter`.
 
 ## Download
 
-Release APKs: [https://github.com/nquang510/miniproject_orc/releases/latest](https://github.com/nquang510/miniproject_orc/releases/latest)
+Release APKs: [https://github.com/thiennn20/Expense-OCR/releases/latest](https://github.com/thiennn20/Expense-OCR/releases/latest)
 
 ![Screens](docs/screenshots/01_dashboard.png)
 
@@ -34,8 +34,8 @@ JDK 17. You need a physical Android device or an emulator with a camera
 (ML Kit does not run on desktop or web).
 
 ```bash
-git clone https://github.com/nquang510/miniproject_orc.git
-cd miniproject_orc
+git clone https://github.com/thiennn20/Expense-OCR.git
+cd Expense-OCR
 flutter pub get
 
 # run on a connected device

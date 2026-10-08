@@ -21,7 +21,7 @@ class _HomeShellState extends State<HomeShell> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_tab == 0 ? 'Receipt Expenses' : 'History'),
+        title: Text(_tab == 0 ? 'Expense-OCR' : 'History'),
         actions: [
           IconButton(
             tooltip: 'Add manually',

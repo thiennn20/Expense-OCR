@@ -2,14 +2,14 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ocr_expense_tracker/core/formatters.dart';
-import 'package:ocr_expense_tracker/data/expense_repository.dart';
-import 'package:ocr_expense_tracker/models/expense.dart';
-import 'package:ocr_expense_tracker/models/expense_category.dart';
-import 'package:ocr_expense_tracker/state/expense_store.dart';
-import 'package:ocr_expense_tracker/ui/widgets/chart_math.dart';
-import 'package:ocr_expense_tracker/ui/widgets/donut_chart.dart';
-import 'package:ocr_expense_tracker/ui/widgets/weekly_bar_chart.dart';
+import 'package:expense_ocr/core/formatters.dart';
+import 'package:expense_ocr/data/expense_repository.dart';
+import 'package:expense_ocr/models/expense.dart';
+import 'package:expense_ocr/models/expense_category.dart';
+import 'package:expense_ocr/state/expense_store.dart';
+import 'package:expense_ocr/ui/widgets/chart_math.dart';
+import 'package:expense_ocr/ui/widgets/donut_chart.dart';
+import 'package:expense_ocr/ui/widgets/weekly_bar_chart.dart';
 
 Expense _e(double amount, ExpenseCategory c, DateTime date) => Expense(
     merchant: 'M', amount: amount, category: c, date: date, createdAt: date);
